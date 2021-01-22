@@ -15,7 +15,11 @@ pipeline {
         DEV_PROJECT = "sorenjonsson94-books-dev"
         STAGE_PROJECT = "sorenjonsson94-books-stage"
         APP_GIT_URL = "https://github.com/soerenjonsson/DO288-apps"
+<<<<<<< HEAD
         NEXUS_SERVER = "nexus-common.apps.eu45.prod.nextcle.com"
+=======
+        NEXUS_SERVER = "http://nexus-common.apps.ocp-eu2.prod.nextcle.com/repository/nodejs"
+>>>>>>> 77227465640a48c2314a4c9c41505e753b83b597
 
         // DO NOT CHANGE THE GLOBAL VARS BELOW THIS LINE
         APP_NAME = "books"
@@ -62,12 +66,21 @@ pipeline {
                 //TODO: Create a new app and expose the service
 		sh '''
 			oc project ${DEV_PROJECT}
+<<<<<<< HEAD
 			oc new-app --as-deployment-config --name books nodejs:12-${APP_GIT_URL} \
 			--build-env npm_config_registry=${NEXUS_SERVER} \
 			--context-dir ${APP_NAME}
 
 			oc expose svc/${APP_NAME}
 		'''
+=======
+			oc new-app --name=${APP_NAME} nodejs:8~${APP_GIT_URL}#custom-pipeline \
+			--build-env npm_config_registry=${NEXUS_SERVER} \
+			--context-dir=${APP_NAME}
+
+			oc expose svc ${APP_NAME}
+	  	    '''
+>>>>>>> 77227465640a48c2314a4c9c41505e753b83b597
             }
         }
 
@@ -110,9 +123,15 @@ pipeline {
                 }
                 //TODO: Tag the books:latest image stream as books:stage
 		script {
+<<<<<<< HEAD
 			openshift.withCluster() {
 			openshift.tag("${DEV_PROJECT}/books:latest", "${STAGE_PROJECT}/books:stage")
 			}
+=======
+		    openshift.withCluster() {
+		    openshift.tag("${DEV_PROJECT}/books:latest", "${STAGE_PROJECT}/books:stage")
+		  }
+>>>>>>> 77227465640a48c2314a4c9c41505e753b83b597
 		}
             }
         }
@@ -127,12 +146,21 @@ pipeline {
                    '''
 
                 echo '### Creating a new app in Staging ###'
+<<<<<<< HEAD
                 //TODO: Create a new app in stage using the books:stage image stream and expose the service
 		sh '''
 		oc project ${STAGE_PROJECT}
 		oc new-app --as-deployment-config --name books -i books:stage
 		oc expose svc/${APP_NAME}
 		'''
+=======
+                //TODO: Create a new app in stage using the books:stage image stream and expose the svc
+		sh '''
+			oc project ${STAGE_PROJECT}
+			oc new-app --name ${APP_NAME} -i books:stage
+			oc expose svc ${APP_NAME}
+		   '''
+>>>>>>> 77227465640a48c2314a4c9c41505e753b83b597
             }
         }
 
@@ -146,11 +174,20 @@ pipeline {
                     openshift.withCluster() {
                         //TODO: Watch deployment until pod is in 'Running' state
 			openshift.withProject( "${STAGE_PROJECT}" ) {
+<<<<<<< HEAD
 				def deployment = openshift.selector("dc", "${APP_NAME}").rollout()
 				openshift.selector("dc", "${APP_NAME}").related('pods').untilEach(1) {
 					return (it.object().status.phase == "Running")
 				}
 			}
+=======
+			  def deployment = openshift.selector("dc", "${APP_NAME}").rollout()
+			  openshift.selector("dc", "${APP_NAME}").related('pods').untilEach(1) {
+			    return (it.object().status.phase == "Running")
+			  }
+			}
+
+>>>>>>> 77227465640a48c2314a4c9c41505e753b83b597
                         echo "Deployment to Staging env is complete. Access the app at the URL http://${routeHost}."
                     }
                 }
